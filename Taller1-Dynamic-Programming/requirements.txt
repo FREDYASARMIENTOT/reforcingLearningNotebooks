@@ -1,0 +1,10 @@
+gymnasium>=1.2
+numpy>=2.4
+matplotlib>=3.10
+seaborn>=0.13
+tqdm>=4.67
+ipython>=8.0
+jupyter>=1.0
+pyyaml>=6.0
+nbformat>=5.0
+nbconvert>=7.0

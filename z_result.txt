@@ -1,0 +1,20 @@
+=== GIT STATUS ===
+?? Taller1-Dynamic-Programming/
+?? aaa.py
+?? audit_git.py
+?? ejecutar_notebook_mock.py
+?? rl-basics/
+?? run_audit.bat
+?? run_audit.py
+
+=== GIT BRANCH ===
+(empty)
+
+=== GIT REMOTE ===
+(empty)
+
+=== GIT LOG ===
+fatal: your current branch 'main' does not have any commits yet
+
+=== GIT ROOT ===
+D:/ReforcingLearning

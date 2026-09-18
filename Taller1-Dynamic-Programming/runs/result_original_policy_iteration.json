@@ -1,0 +1,13 @@
+{
+  "variant": "original",
+  "algorithm": "policy_iteration",
+  "n_iterations": 11,
+  "v_start": 1818.3862197156438,
+  "runtime_s": 4.991300699999556,
+  "return_mean": 28.134099069144938,
+  "return_std": 10.043710787758005,
+  "return_ci": 0.6225156440866582,
+  "success_rate": 1.0,
+  "mean_ep_length": 100.0,
+  "n_deliveries": 7.094
+}

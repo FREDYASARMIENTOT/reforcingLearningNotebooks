@@ -1,0 +1,10 @@
+import sys, subprocess
+r = subprocess.run(["git", "status", "--short"], cwd="d:\\ReforcingLearning", capture_output=True, text=True)
+sys.stdout.write("GIT STATUS:\n" + (r.stdout.strip() or "(empty)") + "\n\n")
+r2 = subprocess.run(["git", "branch"], cwd="d:\\ReforcingLearning", capture_output=True, text=True)
+sys.stdout.write("GIT BRANCH:\n" + (r2.stdout.strip() or "(empty)") + "\n\n")
+r3 = subprocess.run(["git", "remote", "-v"], cwd="d:\\ReforcingLearning", capture_output=True, text=True)
+sys.stdout.write("GIT REMOTE:\n" + (r3.stdout.strip() or "(empty)") + "\n\n")
+r4 = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd="d:\\ReforcingLearning", capture_output=True, text=True)
+sys.stdout.write("GIT ROOT:\n" + r4.stdout.strip() + "\n")
+sys.stdout.flush()

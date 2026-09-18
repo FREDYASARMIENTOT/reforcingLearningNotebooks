@@ -1,0 +1,13 @@
+{
+  "variant": "stochastic",
+  "algorithm": "policy_iteration",
+  "n_iterations": 7,
+  "v_start": 1771.299639188092,
+  "runtime_s": 2.8804929000034463,
+  "return_mean": 5.452925278658369,
+  "return_std": 10.554077368591697,
+  "return_ci": 0.6541484924931695,
+  "success_rate": 1.0,
+  "mean_ep_length": 100.0,
+  "n_deliveries": 5.392
+}
