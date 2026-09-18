@@ -1,0 +1,5 @@
+variant,algorithm,iterations,V_start,runtime_s,return_mean,return_ci,success_rate,mean_ep_len,n_deliveries
+original,policy_iteration,11,1818.386220,4.9913,28.1341,0.6225,1.0000,100.00,7.09
+original,value_iteration,2591,1818.386220,6.0626,28.1341,0.6225,1.0000,100.00,7.09
+stochastic,policy_iteration,7,1771.299639,2.8805,5.4529,0.6541,1.0000,100.00,5.39
+stochastic,value_iteration,2592,1771.299639,5.3228,5.4529,0.6541,1.0000,100.00,5.39

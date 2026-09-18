@@ -1,0 +1,15 @@
+environment:
+  variant: original
+  slip_probability: 0.0
+
+algorithm:
+  name: policy_iteration
+  gamma: 0.99
+  tol: 1e-10
+  max_iter: 500
+
+evaluation:
+  n_runs: 1000
+
+experiment:
+  seed: 0
