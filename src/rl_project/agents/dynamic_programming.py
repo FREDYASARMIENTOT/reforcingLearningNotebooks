@@ -72,28 +72,82 @@ def greedy_policy(Q):
     return pi
 
 
-def policy_iteration(P, R, gamma, max_iter=1_000):
-    """Policy Iteration: evaluate -> improve -> repeat until stable."""
+def policy_iteration(P, R, gamma, max_iter=1_000, collect_snapshots=False):
+    """Policy Iteration: evaluate -> improve -> repeat until stable.
+
+    Parameters
+    ----------
+    P, R : ndarray
+        Transition tensor and reward matrix.
+    gamma : float
+        Discount factor.
+    max_iter : int
+        Maximum number of iterations.
+    collect_snapshots : bool, default=False
+        If True, return an additional list of snapshots dicts, one per iteration.
+
+    Returns
+    -------
+    V, pi, n_iter : ndarray, ndarray, int
+        Optimal value function, policy, and number of iterations.
+    snapshots : list[dict], optional
+        Only returned when collect_snapshots=True.
+        Each dict has keys: 'iteration', 'V', 'pi'.
+    """
     nS, nA = R.shape
     pi = np.ones((nS, nA)) / nA
+    snapshots = []
 
     for k in range(max_iter):
         V = solve_policy_direct(P, R, pi, gamma)
+        if collect_snapshots:
+            snapshots.append({"iteration": k, "V": V.copy(), "pi": pi.copy()})
         Q = q_from_v(P, R, V, gamma)
         pi_new = greedy_policy(Q)
 
         if np.array_equal(pi_new.argmax(axis=1), pi.argmax(axis=1)):
+            if collect_snapshots:
+                snapshots.append({"iteration": k + 1, "V": V.copy(), "pi": pi_new.copy()})
+                return V, pi_new, k + 1, snapshots
             return V, pi_new, k + 1
 
         pi = pi_new
 
+    if collect_snapshots:
+        return V, pi, k + 1, snapshots
     return V, pi, k + 1
 
 
-def value_iteration(P, R, gamma, tol=1e-10, max_iter=100_000):
-    """Value Iteration: V_{k+1}(s) = max_a [R[s,a] + gamma * sum P * V_k]"""
+def value_iteration(P, R, gamma, tol=1e-10, max_iter=100_000, collect_snapshots=False,
+                    max_snapshots=80):
+    """Value Iteration: V_{k+1}(s) = max_a [R[s,a] + gamma * sum P * V_k]
+
+    Parameters
+    ----------
+    P, R : ndarray
+        Transition tensor and reward matrix.
+    gamma : float
+        Discount factor.
+    tol : float
+        Convergence tolerance.
+    max_iter : int
+        Maximum sweeps.
+    collect_snapshots : bool, default=False
+        If True, return an additional list of snapshot dicts.
+    max_snapshots : int
+        Maximum number of snapshots to collect (sampled evenly).
+
+    Returns
+    -------
+    V, pi, n_sweeps, deltas : ndarray, ndarray, int, list
+        Value function, policy, sweep count, delta history.
+    snapshots : list[dict], optional
+        Only returned when collect_snapshots=True.
+        Each dict has keys: 'sweep', 'V', 'pi', 'delta'.
+    """
     V = np.zeros(R.shape[0])
     deltas = []
+    snapshots = []
 
     for k in range(max_iter):
         Q = q_from_v(P, R, V, gamma)
@@ -101,10 +155,48 @@ def value_iteration(P, R, gamma, tol=1e-10, max_iter=100_000):
         delta = float(np.max(np.abs(V_new - V)))
         deltas.append(delta)
         V = V_new
+
         if delta < tol:
             break
+
+    # Now we know the total sweeps; resample snapshots evenly if requested
+    n_sweeps_total = k + 1
+
+    if collect_snapshots:
+        n_target = min(max_snapshots, n_sweeps_total)
+        # Collect first, last, and evenly spaced snapshots in between
+        if n_target <= 2:
+            capture_sweeps = {1, n_sweeps_total}
+        else:
+            step = (n_sweeps_total - 1) / (n_target - 1)
+            capture_sweeps = {1}
+            for i in range(1, n_target - 1):
+                capture_sweeps.add(round(1 + i * step))
+            capture_sweeps.add(n_sweeps_total)
+
+        # Re-run to collect snapshots at the target sweeps
+        V = np.zeros(R.shape[0])
+        for k in range(n_sweeps_total):
+            Q = q_from_v(P, R, V, gamma)
+            V_new = Q.max(axis=1)
+            delta = float(np.max(np.abs(V_new - V)))
+            n_sweeps = k + 1
+            if n_sweeps in capture_sweeps or delta < tol:
+                pi_snapshot = greedy_policy(Q)
+                snapshots.append({
+                    "sweep": n_sweeps,
+                    "V": V_new.copy(),
+                    "pi": pi_snapshot.copy(),
+                    "delta": delta,
+                })
+            V = V_new
+
+        assert len(snapshots) == len(capture_sweeps), \
+            f"Expected {len(capture_sweeps)} snapshots, got {len(snapshots)}"
 
     Q = q_from_v(P, R, V, gamma)
     pi = greedy_policy(Q)
 
-    return V, pi, k + 1, deltas
+    if collect_snapshots:
+        return V, pi, n_sweeps_total, deltas, snapshots
+    return V, pi, n_sweeps_total, deltas
